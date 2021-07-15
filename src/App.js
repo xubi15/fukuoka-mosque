@@ -112,7 +112,7 @@ export default function SignIn() {
         if (name !== '' && country !== '' && value !== '') {
             //console.log("api calling")
             // api call
-            axios.post('https://3fe51c7b0eaa.ngrok.io/registrar', {
+            axios.post('https://salty-escarpment-01197.herokuapp.com/registrar', {
                 name:name,
                 country_of_origin:country,
                 phone_number:phone,

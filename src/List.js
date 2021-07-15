@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
 import MUIDataTable from 'mui-datatables'
-import CustomToolbarSelect from './CustomToolbarSelect'
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -60,12 +60,13 @@ const useStyles = makeStyles((theme) => ({
 export default function List() {
     const [stp, setStp] = useState("replace");
     const columns = ["Name", "Country", "Prayer Time", "Phone", "Email"];
-    const data = [
+    const rawData = [
         ["Zobair Alam", "Bangladesh", "7:00", "07083694797", "zubi@gmail.com"],
         ["Fahim Chowdhury", "India", "8:00", "09083698767", "fahim@gmail.com"],
         ["Rafiqul Islam Maruf", "Pakistan", "7:00", "01083698767", "maruf@gmail.com"],
         ["Md Zulfiqur Hyder", "Turkey", "9:00", "02083698767", "hyder@gmail.com"],
     ];
+    const [data, setData] = useState([])
     const classes = useStyles();
     const options = {
         filter: true,
@@ -74,10 +75,32 @@ export default function List() {
         responsive: "vertical",
         rowsPerPage: 10,
         selectToolbarPlacement: stp,
-        customToolbarSelect: (selectedRows, displayData, setSelectedRows) => (
-            <CustomToolbarSelect selectedRows={selectedRows} displayData={displayData} setSelectedRows={setSelectedRows} />
-        ),
     };
+
+    useEffect(() => {
+        const func = () => {
+            let tempData = []
+            axios.get("https://salty-escarpment-01197.herokuapp.com/registrar/list").then(res => {
+                console.log(res.data)
+
+                if (res.data.code === 200) {
+                    res.data.data.map((item) => {
+                        console.log(item)
+                        let tempRow = []
+                        tempRow.push(item.name)
+                        tempRow.push(item.country_of_origin)
+                        tempRow.push(item.prayer_time_slot+":00 AM")
+                        tempRow.push(item.phone_number)
+                        tempRow.push(item.email_address)
+                        tempData.push(tempRow)
+                    })
+                    console.log(tempData)
+                    setData(tempData)
+                }
+            })
+        }
+        func()
+    }, [])
 
     return (
         <div>
