@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
 import MUIDataTable from 'mui-datatables'
+import CustomToolbarSelect from './CustomToolbarSelect'
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -56,17 +57,27 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const columns = ["Name", "Country", "Prayer Time", "Phone", "Email"];
-
-const data = [
-    ["Zobair Alam", "Bangladesh", "7:00", "07083694797", "zubi@gmail.com"],
-    ["Fahim Chowdhury", "India", "8:00", "09083698767", "fahim@gmail.com"],
-    ["Rafiqul Islam Maruf", "Pakistan", "7:00", "01083698767", "maruf@gmail.com"],
-    ["Md Zulfiqur Hyder", "Turkey", "9:00", "02083698767", "hyder@gmail.com"],
-];
-
 export default function List() {
+    const [stp, setStp] = useState("replace");
+    const columns = ["Name", "Country", "Prayer Time", "Phone", "Email"];
+    const data = [
+        ["Zobair Alam", "Bangladesh", "7:00", "07083694797", "zubi@gmail.com"],
+        ["Fahim Chowdhury", "India", "8:00", "09083698767", "fahim@gmail.com"],
+        ["Rafiqul Islam Maruf", "Pakistan", "7:00", "01083698767", "maruf@gmail.com"],
+        ["Md Zulfiqur Hyder", "Turkey", "9:00", "02083698767", "hyder@gmail.com"],
+    ];
     const classes = useStyles();
+    const options = {
+        filter: true,
+        selectableRows: 'multiple',
+        filterType: "dropdown",
+        responsive: "vertical",
+        rowsPerPage: 10,
+        selectToolbarPlacement: stp,
+        customToolbarSelect: (selectedRows, displayData, setSelectedRows) => (
+            <CustomToolbarSelect selectedRows={selectedRows} displayData={displayData} setSelectedRows={setSelectedRows} />
+        ),
+    };
 
     return (
         <div>
@@ -81,6 +92,7 @@ export default function List() {
                 title={"Employee List"}
                 data={data}
                 columns={columns}
+                options={options}
             />
         </div>
     );
