@@ -5,6 +5,7 @@ import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
 import MUIDataTable from 'mui-datatables'
 import axios from "axios";
+import LinearProgress from "@material-ui/core/LinearProgress";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -55,19 +56,20 @@ const useStyles = makeStyles((theme) => ({
     table: {
         minWidth: 650,
     },
+    linearProgress: {
+        width: '100%',
+        marginTop: theme.spacing(2)
+    }
 }));
 
 export default function List() {
+
     const [stp, setStp] = useState("replace");
+    const [isLoading, setIsLoading] = useState(true);
     const columns = ["Name", "Country", "Prayer Time", "Phone", "Email"];
-    const rawData = [
-        ["Zobair Alam", "Bangladesh", "7:00", "07083694797", "zubi@gmail.com"],
-        ["Fahim Chowdhury", "India", "8:00", "09083698767", "fahim@gmail.com"],
-        ["Rafiqul Islam Maruf", "Pakistan", "7:00", "01083698767", "maruf@gmail.com"],
-        ["Md Zulfiqur Hyder", "Turkey", "9:00", "02083698767", "hyder@gmail.com"],
-    ];
     const [data, setData] = useState([])
     const classes = useStyles();
+
     const options = {
         filter: true,
         selectableRows: 'multiple',
@@ -81,22 +83,21 @@ export default function List() {
         const func = () => {
             let tempData = []
             axios.get("https://salty-escarpment-01197.herokuapp.com/registrar/list").then(res => {
-                console.log(res.data)
-
+                setIsLoading(true)
                 if (res.data.code === 200) {
                     res.data.data.map((item) => {
                         console.log(item)
                         let tempRow = []
                         tempRow.push(item.name)
                         tempRow.push(item.country_of_origin)
-                        tempRow.push(item.prayer_time_slot+":00 AM")
+                        tempRow.push(item.prayer_time_slot + ":00 AM")
                         tempRow.push(item.phone_number)
                         tempRow.push(item.email_address)
                         tempData.push(tempRow)
                     })
-                    console.log(tempData)
                     setData(tempData)
                 }
+                setIsLoading(false)
             })
         }
         func()
@@ -111,12 +112,15 @@ export default function List() {
                     </Typography>
                 </Toolbar>
             </AppBar>
-            <MUIDataTable
-                title={"Employee List"}
-                data={data}
-                columns={columns}
-                options={options}
-            />
+            {
+                !isLoading ?
+                    <MUIDataTable
+                        title={"Registered List"}
+                        data={data}
+                        columns={columns}
+                        options={options}
+                    /> : <LinearProgress className={classes.linearProgress}/>
+            }
         </div>
     );
 }
